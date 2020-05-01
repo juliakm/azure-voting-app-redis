@@ -1,0 +1,107 @@
+# Deploy to Kubernetes - Review app with Azure DevSpaces
+# Build and push image to Azure Container Registry; Deploy to Azure Kuberentes Services and setup Review App with Azure DevSpaces
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- master
+
+resources:
+- repo: self
+
+variables:
+
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: 'a929c148-a649-40d8-89e2-705f89a1a18f'
+  imageRepository: 'juliakmazurevotingappredis'
+  containerRegistry: 'mycontainerjulia.azurecr.io'
+  dockerfilePath: '**/Dockerfile'
+  tag: '$(Build.BuildId)'
+  imagePullSecret: 'mycontainerjulia162639a3-auth'
+
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+  
+  # Azure Service connection
+  azureConnection: '32ab2cdb-2398-41ed-ad16-d6af96c793c6'
+  
+
+stages:
+- stage: Build
+  displayName: Build stage
+  jobs:  
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+          
+    - upload: charts
+      artifact: charts
+
+- stage: Deploy
+  displayName: Deploy stage
+  dependsOn: Build
+
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy
+    pool:
+      vmImage: $(vmImageName)
+    environment: 'juliakmazurevotingappredis-6310.azds'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: KubernetesManifest@0
+            displayName: Create imagePullSecret
+            inputs:
+              action: createSecret
+              secretName: $(imagePullSecret)
+              dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
+
+          - task: AzureCLI@2
+            displayName: get host suffix
+            inputs:
+              scriptType: pscore
+              scriptLocation: inlineScript
+              azureSubscription: $(azureConnection)
+              inlineScript: |
+                $clusterId="/subscriptions/9bee9142-51ab-404e-92a2-68ef154bd997/resourcegroups/myK8ResourceGroup/providers/Microsoft.ContainerService/managedClusters/MyAKS"
+                $resourceGroupName=$(cut -d '/' -f5 <<< "$clusterId")
+                $clusterName=$(cut -d '/' -f9 <<< "$clusterId")
+                az aks use-dev-spaces -n $clusterName -g $resourceGroupName -s azds -y
+                $hostSuffix=$(azds show-context -o json | ConvertFrom-Json).controller.hostSuffix
+                echo "##vso[task.setvariable variable=HostSuffix]$hostSuffix"
+
+          - task: KubernetesManifest@0
+            displayName: Bake manifests
+            name: bake
+            inputs:
+              action: bake
+              helmChart: $(Pipeline.Workspace)/charts/devspaces-v0.0.1.tgz
+              overrides: |
+                image.repository:$(containerRegistry)/$(imageRepository)
+                service.port:80 
+                ingress.enabled:true
+                ingress.hostname:app.$(HostSuffix)
+              
+          - task: KubernetesManifest@0
+            displayName: Deploy to Kubernetes cluster
+            inputs:
+              action: deploy
+              manifests: |
+                $(bake.manifestsBundle)
+              imagePullSecrets: |
+                $(imagePullSecret)
+              containers: |
+                $(containerRegistry)/$(imageRepository):$(tag)
+
