@@ -1,0 +1,16 @@
+apiVersion : apps/v1beta1
+kind: Deployment
+metadata:
+  name: juliakmazurevotingappredis 
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: juliakmazurevotingappredis 
+    spec:
+      containers:
+        - name: juliakmazurevotingappredis 
+          image: mycontainerjulia.azurecr.io/juliakmazurevotingappredis
+          ports:
+          - containerPort: 80
