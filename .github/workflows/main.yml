@@ -54,7 +54,7 @@ jobs:
         container-registry-url: ${{ env.REGISTRY_NAME }}.azurecr.io
         container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
         container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-        secret-name: ${{ env.REGISTRY_NAME }}-registry-connection
+        secret-name: secret-registry-connection
         namespace: ${{ env.NAMESPACE }}
     
     # Deploy app to AKS
@@ -66,7 +66,7 @@ jobs:
         images: |
           ${{ env.REGISTRY_NAME }}.azurecr.io/azure-vote-front:${{ github.sha }}
         imagepullsecrets: |
-          ${{ env.REGISTRY_NAME }}-registry-connection
+          secret-registry-connection
         namespace: ${{ env.NAMESPACE }}
 
 
