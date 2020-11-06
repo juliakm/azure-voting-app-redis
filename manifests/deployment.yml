@@ -6,7 +6,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-        name: sawtooth-0
+        app: juliakmazurevotingappredis
   template:
     metadata:
       labels:
