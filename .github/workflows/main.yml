@@ -15,13 +15,13 @@ jobs:
     - run: |
         docker build . -t myk8cr.azurecr.io/azure-vote-front:${{ github.sha }}
         docker push myk8cr.azurecr.io/azure-vote-front:${{ github.sha }}
-      
+
     # Set the target AKS cluster.
     - uses: Azure/aks-set-context@v1
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}'
-        cluster-name: contoso
-        resource-group: contoso-rg
+        cluster-name: myAKSCluster
+        resource-group: myk8rg
         
     - uses: Azure/k8s-create-secret@v1
       with:
