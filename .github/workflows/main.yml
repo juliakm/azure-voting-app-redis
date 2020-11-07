@@ -17,7 +17,7 @@ env:
   REGISTRY_NAME: myk8Cr
   CLUSTER_NAME: myAKSCluster
   CLUSTER_RESOURCE_GROUP: myk8rg
-  NAMESPACE: python
+  NAMESPACE: azurevote
   
 jobs:
   build:
@@ -60,6 +60,7 @@ jobs:
     # Deploy app to AKS
     - uses: azure/k8s-deploy@v1
       with:
+       # namespace: ${{ env.NAMESPACE }}
         manifests: |
           manifests/deployment.yml
           manifests/service.yml
@@ -67,7 +68,7 @@ jobs:
           ${{ env.REGISTRY_NAME }}.azurecr.io/azure-vote-front:${{ github.sha }}
         imagepullsecrets: |
           secret-registry-connection
-        namespace: ${{ env.NAMESPACE }}
+        kubectl-version: 'latest'
 
 
 # on: [push]
