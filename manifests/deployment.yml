@@ -4,7 +4,7 @@ metadata:
   name: juliakmazurevotingappredis 
 spec:
   replicas: 1
-  progressDeadlineSeconds: 1200
+  progressDeadlineSeconds: 120
   selector:
     matchLabels:
         app: juliakmazurevotingappredis
