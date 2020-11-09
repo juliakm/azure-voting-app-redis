@@ -63,7 +63,7 @@ spec:
         image: myk8cr.azurecr.io/azure-vote-front:v1
         progressDeadlineSeconds: 6000
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         resources:
           requests:
             cpu: 250m
