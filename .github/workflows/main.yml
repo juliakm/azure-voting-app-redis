@@ -1,16 +1,4 @@
-  
-# This workflow will build a docker container, publish it to Azure Container Registry, and deploy it to Azure Kubernetes Service.
-#
-# To configure this workflow:
-#
-# 1. Set up the following secrets in your workspace: 
-#     a. REGISTRY_USERNAME with ACR username
-#     b. REGISTRY_PASSWORD with ACR Password
-#     c. AZURE_CREDENTIALS with the output of `az ad sp create-for-rbac --sdk-auth`
-#
-# 2. Change the values for the REGISTRY_NAME, CLUSTER_NAME, CLUSTER_RESOURCE_GROUP and NAMESPACE environment variables (below).
-
-on: [push]
+ on: [push]
 
 # Environment variables available to all jobs and steps in this workflow
 env:
@@ -18,6 +6,8 @@ env:
   CLUSTER_NAME: myAKSCluster
   CLUSTER_RESOURCE_GROUP: myk8rg
   NAMESPACE: development
+  SECRET: k8s-secret
+  APP_NAME: azure-vote-front
   
 jobs:
   build:
@@ -34,8 +24,8 @@ jobs:
     
     # Container build and push to a Azure Container registry (ACR)
     - run: |
-        docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/azure-vote-front:${{ github.sha }}
-        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/azure-vote-front:${{ github.sha }}
+        docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
+        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
     
     # Set the target Azure Kubernetes Service (AKS) cluster. 
     - uses: azure/aks-set-context@v1
@@ -48,71 +38,24 @@ jobs:
     - run: |
         kubectl create namespace ${{ env.NAMESPACE }} --dry-run -o json | kubectl apply -f -
     
-    # Create imagepullsecret for Azure Container registry (ACR)
+    # Create image pull secret for Azure Container registry (ACR)
     - uses: azure/k8s-create-secret@v1
       with:
         container-registry-url: ${{ env.REGISTRY_NAME }}.azurecr.io
         container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
         container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-        secret-name: secret-registry-connection
-        namespace: ${{ env.NAMESPACE }}
+        secret-name: ${{ env.SECRET }}
+    #    namespace: ${{ env.NAMESPACE }}
     
-    - uses: azure/k8s-lint@v1
-      with:
-       manifests: |
-        manifests/deployment.yml
-        manifests/service.yml
-
-#     # Deploy app to AKS
+    # Deploy app to AKS
     - uses: azure/k8s-deploy@v1
       with:
         manifests: |
           manifests/deployment.yml
           manifests/service.yml
         images: |
-          ${{ env.REGISTRY_NAME }}.azurecr.io/azure-vote-front:${{ github.sha }}
+          ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
         imagepullsecrets: |
-          secret-registry-connection
-        namespace: ${{ env.NAMESPACE }}
-
-
-# on: [push]
-
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - uses: actions/checkout@master
-    
-#     - uses: Azure/docker-login@v1
-#       with:
-#         login-server: myk8cr.azurecr.io
-#         username: ${{ secrets.REGISTRY_USERNAME }}
-#         password: ${{ secrets.REGISTRY_PASSWORD }}
-    
-#     - run: |
-#         docker build . -t myk8cr.azurecr.io/azure-vote-front:${{ github.sha }}
-#         docker push myk8cr.azurecr.io/azure-vote-front:${{ github.sha }}
-
-#     # Set the target AKS cluster.
-#     - uses: Azure/aks-set-context@v1
-#       with:
-#         creds: '${{ secrets.AZURE_CREDENTIALS }}'
-#         cluster-name: myAKSCluster
-#         resource-group: myk8rg
-        
-#     - uses: Azure/k8s-create-secret@v1
-#       with:
-#         container-registry-url: myk8cr.azurecr.io
-#         container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
-#         container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-#         secret-name: demo-k8s-secret
-
-#     - uses: Azure/k8s-deploy@v1
-#       with:
-#         manifests: |
-#           azure-vote-all-in-one-redis.yaml
-#         images: |
-#           myk8cr.azurecr.io/azure-vote-front:${{ github.sha }}
-#         imagepullsecrets: |
-#           demo-k8s-secret
+          ${{ env.SECRET }}
+ #       namespace: ${{ env.NAMESPACE }}
+         
