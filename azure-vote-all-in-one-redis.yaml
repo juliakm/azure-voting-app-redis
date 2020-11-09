@@ -42,6 +42,7 @@ metadata:
   name: azure-vote-front
 spec:
   replicas: 1
+  progressDeadlineSeconds: 6000
   selector:
     matchLabels:
       app: azure-vote-front
@@ -60,6 +61,7 @@ spec:
       containers:
       - name: azure-vote-front
         image: myk8cr.azurecr.io/azure-vote-front:v1
+        progressDeadlineSeconds: 6000
         ports:
         - containerPort: 80
         resources:
