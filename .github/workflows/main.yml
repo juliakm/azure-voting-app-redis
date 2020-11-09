@@ -17,7 +17,7 @@ env:
   REGISTRY_NAME: myk8Cr
   CLUSTER_NAME: myAKSCluster
   CLUSTER_RESOURCE_GROUP: myk8rg
-  NAMESPACE: default
+  NAMESPACE: mykubernetesspace
   
 jobs:
   build:
