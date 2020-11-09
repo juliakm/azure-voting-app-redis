@@ -56,7 +56,6 @@ jobs:
         container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
         secret-name: secret-registry-connection
         namespace: ${{ env.NAMESPACE }}
-        force: true
     
     - uses: azure/k8s-lint@v1
       with:
@@ -65,16 +64,16 @@ jobs:
         manifests/service.yml
 
 #     # Deploy app to AKS
-#     - uses: azure/k8s-deploy@v1
-#       with:
-#         manifests: |
-#           manifests/deployment.yml
-#           manifests/service.yml
-#         images: |
-#           ${{ env.REGISTRY_NAME }}.azurecr.io/azure-vote-front:${{ github.sha }}
-#         imagepullsecrets: |
-#           secret-registry-connection
-#         namespace: ${{ env.NAMESPACE }}
+    - uses: azure/k8s-deploy@v1
+      with:
+        manifests: |
+          manifests/deployment.yml
+          manifests/service.yml
+        images: |
+          ${{ env.REGISTRY_NAME }}.azurecr.io/azure-vote-front:${{ github.sha }}
+        imagepullsecrets: |
+          secret-registry-connection
+        namespace: ${{ env.NAMESPACE }}
 
 
 # on: [push]
