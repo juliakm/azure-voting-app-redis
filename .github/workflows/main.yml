@@ -57,5 +57,5 @@ jobs:
           ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
         imagepullsecrets: |
           ${{ env.SECRET }}
-        namespace: ${{ env.NAMESPACE }}ff
+        namespace: ${{ env.NAMESPACE }}
          
