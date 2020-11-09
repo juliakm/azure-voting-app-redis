@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: azure-vote-back
 spec:
+  progressDeadlineSeconds: 6000
   replicas: 1
   selector:
     matchLabels:
