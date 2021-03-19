@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: "kubernetesenvcluster-7289"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: "kubernetesenvcluster-7289"
+  template:
+    metadata:
+      labels:
+        app: "kubernetesenvcluster-7289"
+    spec:
+      containers:
+        - name: "kubernetesenvcluster-7289"
+          image: "votingappcontainer.azurecr.io/kubernetesenvcluster"
+          ports:
+          - containerPort: 80
