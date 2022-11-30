@@ -1,7 +1,5 @@
-on: [push]
-
 name: Build a container with ACR
-
+    
 permissions:
   id-token: write
   contents: read
@@ -11,8 +9,11 @@ env:
   ACR_NAME: myvotingacr84
   
 on:
-  workflow_dispatch:
-  
+  push:
+    branches:
+    - master
+    - release/*
+    
 jobs:
   build:
     runs-on: ubuntu-latest
