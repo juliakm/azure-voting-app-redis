@@ -34,8 +34,13 @@ jobs:
         login-server: votingappcontainer.azurecr.io
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
-        
-    - name: Build and push image to ACR
+
+    - name: Build and push image to ACR TJ
+      id: build-image-tj
+      run: |
+        az acr build --image $AZURE_WEBAPP_NAME:${{ github.run_number }} --registry $ACR_NAME.azurecr.io .
+
+    - name: Build and push image to ACR Alt
       id: build-image
       run: |
         docker build "$GITHUB_WORKSPACE/azure-vote" -f  "azure-vote/Dockerfile" -t $ACR_NAME.azurecr.io/$AZURE_WEBAPP_NAME:${{ github.sha }} --label dockerfile-path=azure-vote/Dockerfile
