@@ -38,7 +38,7 @@ jobs:
     - name: Build and push image to ACR TJ
       id: build-image-tj
       run: |
-        az acr build --image $AZURE_WEBAPP_NAME:${{ github.run_number }} --registry $ACR_NAME.azurecr.io --file "azure-vote/Dockerfile"
+        az acr build --image $AZURE_WEBAPP_NAME:${{ github.run_number }} --registry $ACR_NAME.azurecr.io --file "azure-vote/Dockerfile" .
 
     - name: Build and push image to ACR Alt
       id: build-image
