@@ -1,3 +1,5 @@
+on: [push]
+
 name: Build a container with ACR
 
 permissions:
