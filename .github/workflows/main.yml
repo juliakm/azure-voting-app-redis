@@ -1,61 +1,28 @@
-on: [push]
+name: Build a container with ACR
 
-# Environment variables available to all jobs and steps in this workflow
+permissions:
+  id-token: write
+  contents: read
+
 env:
-  REGISTRY_NAME: myk8Cr
-  CLUSTER_NAME: myAKSCluster
-  CLUSTER_RESOURCE_GROUP: myk8rg
-  NAMESPACE: default
-  SECRET: k8s-secret
-  APP_NAME: azure-vote-front
+  AZURE_WEBAPP_NAME: webapp-actions-levelup
+  ACR_NAME: myvotingacr84
+  
+on:
+  workflow_dispatch:
   
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@master
-    
-    # Connect to Azure Container registry (ACR)
-    - uses: azure/docker-login@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Az CLI login
+      uses: azure/login@v1
       with:
-        login-server: ${{ env.REGISTRY_NAME }}.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }} 
-        password: ${{ secrets.REGISTRY_PASSWORD }}
-    
-    # Container build and push to a Azure Container registry (ACR)
-    - run: |
-        docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
-        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
-    
-    # Set the target Azure Kubernetes Service (AKS) cluster. 
-    - uses: azure/aks-set-context@v1
-      with:
-        creds: '${{ secrets.AZURE_CREDENTIALS }}'
-        cluster-name: ${{ env.CLUSTER_NAME }}
-        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
-    
-    # Create namespace if doesn't exist
-    - run: |
-        kubectl create namespace ${{ env.NAMESPACE }} --dry-run -o json | kubectl apply -f -
-    
-    # Create image pull secret for Azure Container registry (ACR)
-    - uses: azure/k8s-create-secret@v1
-      with:
-        container-registry-url: ${{ env.REGISTRY_NAME }}.azurecr.io
-        container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
-        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-        secret-name: ${{ env.SECRET }}
-        namespace: ${{ env.NAMESPACE }}
-    
-    # Deploy app to AKS
-    - uses: azure/k8s-deploy@v1
-      with:
-        manifests: |
-          manifests/deployment.yml
-          manifests/service.yml
-        images: |
-          ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.APP_NAME }}:${{ github.sha }}
-        imagepullsecrets: |
-          ${{ env.SECRET }}
-        namespace: ${{ env.NAMESPACE }}
-         
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        
