@@ -29,19 +29,8 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - uses: azure/docker-login@v1
-      with:
-        login-server: votingappcontainer.azurecr.io
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
-
     - name: Build and push image to ACR TJ
-      id: build-image-tj
+      id: build-image
       run: |
         az acr build --image $AZURE_WEBAPP_NAME:${{ github.run_number }} --registry $ACR_NAME.azurecr.io --file "azure-vote/Dockerfile" .
 
-    - name: Build and push image to ACR Alt
-      id: build-image
-      run: |
-        docker build "$GITHUB_WORKSPACE/azure-vote" -f  "azure-vote/Dockerfile" -t $ACR_NAME.azurecr.io/$AZURE_WEBAPP_NAME:${{ github.sha }} --label dockerfile-path=azure-vote/Dockerfile
-        docker push $ACR_NAME.azurecr.io/$AZURE_WEBAPP_NAME:${{ github.sha }}
