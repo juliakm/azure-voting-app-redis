@@ -60,28 +60,20 @@ jobs:
         with:
           resource-group: ${{ env.RESOURCE_GROUP }}
           cluster-name: ${{ env.CLUSTER_NAME }}
-     
-      - name: Try K8 connection
-        run: |
-         az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.CLUSTER_NAME }}
-
-      - name: Create K8 secret
-        uses: Azure/k8s-create-secret@v1.1
-        with:
-            namespace: 'default'
-            container-registry-url: 'myvotingacr84.azurecr.io'
-            container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
-            container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-            secret-name: 'demo-k8s-secret'
+       
+      - name: Setup kubectl
+        id: install-kubectl
+        uses: azure/setup-kubectl@v3
 
       # Deploys application based on given manifest file
       - name: Deploys application
         uses: Azure/k8s-deploy@v4
         with:
           action: deploy
+          namespace: 'default'
           manifests: azure-vote-all-in-one-redis.yaml
           images: |
-            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
-          imagepullsecrets: |
-            demo-k8s-secret
+            myvotingacr84.azurecr.io/azure-vote-front:${{ github.sha }}
+          pull: false
+
           
