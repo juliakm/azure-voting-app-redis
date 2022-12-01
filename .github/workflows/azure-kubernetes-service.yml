@@ -61,6 +61,10 @@ jobs:
           resource-group: ${{ env.RESOURCE_GROUP }}
           cluster-name: ${{ env.CLUSTER_NAME }}
      
+      - name: Try K8 connection
+        run: |
+         az aks get-credentials --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.CLUSTER_NAME }}
+
       - name: Create K8 secret
         uses: Azure/k8s-create-secret@v1.1
         with:
