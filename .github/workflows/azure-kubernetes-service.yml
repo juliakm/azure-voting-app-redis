@@ -35,11 +35,11 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_CONTAINER_REGISTRY: "your-azure-container-registry"
-  CONTAINER_NAME: "your-container-name"
-  RESOURCE_GROUP: "your-resource-group"
-  CLUSTER_NAME: "your-cluster-name"
-  DEPLOYMENT_MANIFEST_PATH: "your-deployment-manifest-path"
+  AZURE_CONTAINER_REGISTRY: "myvotingacr84"
+  CONTAINER_NAME: "azure-vote"
+  RESOURCE_GROUP: "votingAppContainer84ac-rg"
+  CLUSTER_NAME: "votingappcontainer"
+  DEPLOYMENT_MANIFEST_PATH: "manifests"
 
 jobs:
   buildImage:
