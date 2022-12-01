@@ -36,7 +36,7 @@ on:
 
 env:
   AZURE_CONTAINER_REGISTRY: "myvotingacr84"
-  CONTAINER_NAME: "azure-vote"
+  CONTAINER_NAME: "azure-vote-front"
   RESOURCE_GROUP: "votingAppContainer84ac-rg"
   CLUSTER_NAME: "votingappcontainer"
   DEPLOYMENT_MANIFEST_PATH: "azure-vote-all-in-one-redis.yaml"
