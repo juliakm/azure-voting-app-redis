@@ -64,7 +64,7 @@ jobs:
       - name: Create K8 secret
         uses: Azure/k8s-create-secret@v1.1
         with:
-            container-registry-url: contoso.azurecr.io
+            container-registry-url: myvotingacr84.azurecr.io
             container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
             container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
             secret-name: demo-k8s-secret
@@ -74,9 +74,7 @@ jobs:
         uses: Azure/k8s-deploy@v4
         with:
           action: deploy
-          manifests: |
-              manifests/deployment.yml
-              manifests/service.yml
+          manifests: azure-vote-all-in-one-redis.yaml
           images: |
             ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_NAME }}:${{ github.sha }}
           imagepullsecrets: |
