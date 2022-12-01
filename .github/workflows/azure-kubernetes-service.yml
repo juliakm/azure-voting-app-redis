@@ -68,10 +68,11 @@ jobs:
       - name: Create K8 secret
         uses: Azure/k8s-create-secret@v1.1
         with:
-            container-registry-url: myvotingacr84.azurecr.io
+            namespace: 'default'
+            container-registry-url: 'myvotingacr84.azurecr.io'
             container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
             container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-            secret-name: demo-k8s-secret
+            secret-name: 'demo-k8s-secret'
 
       # Deploys application based on given manifest file
       - name: Deploys application
