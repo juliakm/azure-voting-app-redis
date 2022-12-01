@@ -39,7 +39,7 @@ env:
   CONTAINER_NAME: "azure-vote"
   RESOURCE_GROUP: "votingAppContainer84ac-rg"
   CLUSTER_NAME: "votingappcontainer"
-  DEPLOYMENT_MANIFEST_PATH: "manifests"
+  DEPLOYMENT_MANIFEST_PATH: "azure-vote-all-in-one-redis.yaml"
 
 jobs:
   buildImage:
