@@ -9,7 +9,7 @@ env:
   AZURE_CONTAINER_REGISTRY: "myvotingacr84"
   CONTAINER_NAME: "azure-vote-front"
   RESOURCE_GROUP: "votingAppContainer84ac-rg"
-  CLUSTER_NAME: "votingappcontainer"
+  CLUSTER_NAME: "myAKSCluster122"
   DEPLOYMENT_MANIFEST_PATH: "azure-vote-all-in-one-redis.yaml"
 
 jobs:
