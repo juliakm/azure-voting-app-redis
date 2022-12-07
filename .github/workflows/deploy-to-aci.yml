@@ -33,16 +33,16 @@ jobs:
     - name: Build and push image to ACR
       id: build-image
       run: |
-        az acr build --image $AZURE_WEBAPP_NAME:${{ github.run_number }} --registry $ACR_NAME.azurecr.io --file "azure-vote/Dockerfile" .
+        az acr build --image ${{ env.AZURE_WEBAPP_NAME }}:${{ github.run_number }} --registry ${{ env.ACR_NAME }}.azurecr.io --file "azure-vote/Dockerfile" .
 
     - name: 'Deploy to Azure Container Instances'
       uses: 'azure/aci-deploy@v1'
       with:
         resource-group: $RESOURCE_GROUP
         dns-name-label: $RESOURCE_GROUP${{ github.run_number }}
-        image: $ACR_NAME.azurecr.io/$AZURE_WEBAPP_NAME:${{ github.run_number }}
-        registry-login-server: $ACR_NAME.azurecr.io
+        image: ${{ env.ACR_NAME }}.azurecr.io/${{ env.AZURE_WEBAPP_NAME }}:${{ github.run_number }}
+        registry-login-server: ${{ env.ACR_NAME }}.azurecr.io
         registry-username: ${{ secrets.REGISTRY_USERNAME }}
         registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-        name: $AZURE_WEBAPP_NAME
+        name: ${{ env.AZURE_WEBAPP_NAME }}
         location: eastus2
